@@ -133,7 +133,7 @@ footer a{text-decoration:underline}
 document.addEventListener('DOMContentLoaded',function(){
   var BLOCK='h1,h2,h3,h4,p,li,td,th,dd,dt,summary,figcaption';
   var NOBR=['一の位','もう1枚','「プレイヤー」かを予想','よくある質問'];
-  var SKIP='nav,.btn,.tag,.badges,.price,.big,.zero,.logo,.n,.cmp,script,style,noscript';
+  var SKIP='nav,.menu,.btn,.tag,.badges,.price,.big,.zero,.logo,.n,.cmp,script,style,noscript';
   var BJ=/バカラ(?:・|や|と|／|も)ブラックジャック/g;
   var END='。！？', CLOSE='）」』】〉》］)、。，．！？!?・…ー々ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮ';
   function cls(c){
@@ -304,13 +304,48 @@ footer{background:#170d0c;border-top:2px solid var(--wine)}
 .faq-a{position:relative;padding-left:2em;color:var(--mute);margin-top:8px}
 .faq-a::before{content:"A";position:absolute;left:0;top:0;font-family:var(--display);font-weight:700;color:var(--wine-hi)}
 </style>
+<style id="site-menu-css">
+/* メニューボタン（2026-11-15） */
+.menu-btn{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;margin-left:12px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--ink);font:inherit;font-size:14px;font-weight:700;cursor:pointer;flex:none}
+.menu-btn .bars{display:inline-block;width:18px;height:12px;position:relative;border-top:2px solid var(--gold);border-bottom:2px solid var(--gold)}
+.menu-btn .bars::after{content:"";position:absolute;left:0;right:0;top:3px;border-top:2px solid var(--gold)}
+header .wrap{gap:12px}
+header nav{display:none!important}
+header .btn-main{margin-left:auto}
+.menu{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;padding:0 0 40px}
+.menu[hidden]{display:none}
+.menu-top{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;height:64px;padding:0 20px;background:var(--bg);border-bottom:1px solid var(--line)}
+.menu-top b{font-size:15px;letter-spacing:.12em;color:var(--gold)}
+.menu-inner{max-width:720px;margin:0 auto;padding:8px 20px 0}
+.menu h3{font-size:13px;letter-spacing:.12em;color:var(--gold);margin:28px 0 6px}
+.menu ul{list-style:none;margin:0;padding:0}
+.menu li a{display:flex;justify-content:space-between;align-items:center;padding:14px 4px;border-bottom:1px solid var(--line);font-size:17px}
+.menu li a::after{content:"→";color:var(--mute);font-size:14px}
+.menu li a[aria-current="page"]{color:var(--gold)}
+.menu li a small{display:block;font-size:13px;color:var(--mute);font-weight:400}
+.menu .menu-cta{display:grid;gap:10px;margin-top:28px}
+.menu .menu-cta .btn{width:100%}
+body.menu-open{overflow:hidden}
+@media (max-width:767px){.menu-btn{margin-left:auto}}
+@media (max-width:430px){header .menu-btn:not(.menu-close){padding:0 12px;margin-left:8px;min-height:44px}header .menu-btn .mtxt{display:none}}
+</style>
 </head>
 <body>
 <header><div class="wrap">
   <a class="logo" href="../"><img src="../img/logo_crest.png" alt="" width="49" height="38">VALHALLA</a>
   <nav><a href="../#first">はじめての方</a><a href="../#games">ゲーム</a><a href="../#price">料金</a><a href="../#inside">店内</a><a href="../#drink">ドリンク</a><a href="../#faq">よくある質問</a><a href="../#access">アクセス</a></nav>
   <a class="btn btn-main" href="https://line.me/R/ti/p/@642opvwh" target="_blank" rel="noopener">公式LINE</a>
+<button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-menu" aria-label="メニューを開く"><span class="bars" aria-hidden="true"></span><span class="mtxt">メニュー</span></button>
 </div></header>
+<div class="menu" id="site-menu" hidden role="dialog" aria-modal="true" aria-label="メニュー">
+  <div class="menu-top"><b>MENU</b><button class="menu-btn menu-close" type="button" aria-label="メニューを閉じる">閉じる ✕</button></div>
+  <div class="menu-inner">
+    <h3>ページ</h3><ul><li><a href="../"><span>トップ</span></a></li><li><a href="../beginner/"><span>はじめてのポーカー講習</span></a></li><li><a href="../baccarat-blackjack/" aria-current="page"><span>バカラ・ブラックジャック</span></a></li><li><a href="https://rexpoker-nagoya.com/nagoya-poker/" target="_blank" rel="noopener"><span>名古屋でポーカーを始めるなら</span></a></li></ul>
+    <h3>トップページの中</h3><ul><li><a href="../#first"><span>はじめての方</span></a></li><li><a href="../#price"><span>料金</span></a></li><li><a href="../#games"><span>ゲーム</span></a></li><li><a href="../#inside"><span>店内</span></a></li><li><a href="../#drink"><span>ドリンク</span></a></li><li><a href="../#rules"><span>お店のルール</span></a></li><li><a href="../#faq"><span>よくある質問</span></a></li><li><a href="../#access"><span>アクセス</span></a></li></ul>
+    <h3>姉妹店（チップ共通）</h3><ul><li><a href="https://rexpoker-nagoya.com/" target="_blank" rel="noopener"><span>REX POKER NAGOYA<small>新栄・毎日トーナメント</small></span></a></li></ul>
+    <div class="menu-cta"><a class="btn btn-main" href="https://line.me/R/ti/p/@642opvwh" target="_blank" rel="noopener">公式LINEで予約・お問い合わせ</a><a class="btn btn-sub" href="tel:0527469660">電話する（052-746-9660）</a></div>
+  </div>
+</div>
 <main>
 <section class="hero-lp" style="--hero:url(../img/baccarat.jpg)"><div class="wrap">
   <span class="label">BACCARAT &amp; BLACKJACK ／ 名古屋・栄</span>
@@ -396,4 +431,13 @@ footer{background:#170d0c;border-top:2px solid var(--wine)}
 </main>
 <footer><div class="wrap"><span>© VALHALLA</span><span><a href="../">トップへ戻る</a></span></div></footer>
 <div class="fixbar"><a class="btn btn-sub" href="tel:052-746-9660">電話</a><a class="btn btn-main" href="https://line.me/R/ti/p/@642opvwh" target="_blank" rel="noopener">LINEで講習を予約</a></div>
+<script id="site-menu-js">
+(function(){var b=document.querySelector('.menu-btn'),m=document.getElementById('site-menu');if(!b||!m)return;
+var c=m.querySelector('.menu-close');
+function open(){m.hidden=false;b.setAttribute('aria-expanded','true');document.body.classList.add('menu-open');c.focus();}
+function close(){m.hidden=true;b.setAttribute('aria-expanded','false');document.body.classList.remove('menu-open');}
+b.addEventListener('click',open);c.addEventListener('click',function(){close();b.focus();});
+m.addEventListener('click',function(e){if(e.target.closest('a'))close();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){close();b.focus();}});})();
+</script>
 </body></html>
