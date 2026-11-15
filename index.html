@@ -351,7 +351,9 @@ body.menu-open{overflow:hidden}
 
 <main>
 <section class="hero">
-  <video class="hero-video" src="img/hero.mp4" poster="img/poster.jpg" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+  <!-- 新しい動画ができるまで静止画（元の動画 img/hero.mp4 は残してある。戻すときは下の行をこのvideoタグに戻す）
+  <video class="hero-video" src="img/hero.mp4" poster="img/poster.jpg" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video> -->
+  <img class="hero-video" src="img/hero.jpg" alt="" fetchpriority="high">
   <div class="wrap">
     <img class="crest" src="img/logo_crest.png" alt="VALHALLAの紋章" width="88" height="68">
     <span class="label">AMUSEMENT CASINO BAR IN SAKAE, NAGOYA</span>
