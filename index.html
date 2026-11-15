@@ -137,6 +137,167 @@ footer a{text-decoration:underline}
 }
 .sisterbox{display:grid;grid-template-columns:280px 1fr;gap:24px;background:var(--surface);border-radius:16px;padding:20px;border-left:4px solid var(--gold);margin-top:20px}.sisterbox img{width:100%;height:100%;min-height:180px;object-fit:cover;border-radius:12px}.sisterbox b{font-size:20px}.sisterbox p{color:var(--mute);margin:6px 0}.sisterbox .small{font-size:14px}.sisterbox .btn{margin-top:10px}.gmap{width:100%;height:300px;border:0;background:var(--surface);border-radius:16px;margin-top:20px;display:block}@media (max-width:767px){.sisterbox{grid-template-columns:1fr}.sisterbox img{height:auto;aspect-ratio:16/10}.gmap{height:260px}}
 </style>
+<script id="jp-linebreak-js">
+/* 文の終わり（。！？）で改行・「バカラ〜ブラックジャック」は行の頭に・言葉の切れ目でだけ折り返す */
+document.addEventListener('DOMContentLoaded',function(){
+  var BLOCK='h1,h2,h3,h4,p,li,td,th,dd,dt,summary,figcaption';
+  var NOBR=['一の位','もう1枚','「プレイヤー」かを予想','よくある質問'];
+  var SKIP='nav,.btn,.tag,.badges,.price,.big,.zero,.logo,.n,.cmp,script,style,noscript';
+  var BJ=/バカラ(?:・|や|と|／|も)ブラックジャック/g;
+  var END='。！？', CLOSE='）」』】〉》］)、。，．！？!?・…ー々ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮ';
+  function cls(c){
+    if(!c)return '';
+    if(/\s/.test(c))return 'S';
+    if(/[ぁ-ゖ]/.test(c))return 'H';
+    if(/[ァ-ヺー]/.test(c))return 'K';
+    if(/[一-龯々〆ヶ]/.test(c))return 'J';
+    if(/[（「『【〈《［(]/.test(c))return 'O';
+    if(/[）」』】〉》］)、。，．！？!?…]/.test(c))return 'C';
+    return 'A';
+  }
+  function canBreak(full,i){
+    var p=full[i-1],c=full[i],pp=full[i-2];
+    if(!p||!c||c==='\n'||p==='\n')return false;
+    if(CLOSE.indexOf(c)>=0)return false;
+    var a=cls(p),b=cls(c);
+    if(a==='O')return false;
+    if(p==='・'&&(b==='K'||b==='J'||b==='A'))return true;
+    if(b==='O')return true;
+    if(a==='C'&&p!=='…'){
+      if('、。，．！？!?'.indexOf(p)<0&&b==='H')return false;
+      return true;
+    }
+    if((p==='お'||p==='ご')&&(b==='J'||b==='K'))return false;
+    if(p==='の'&&c==='方')return false;
+    if(a==='H'&&(c==='お'||c==='ご')&&/[JK]/.test(cls(full[i+1])))return true;
+    if(a==='H'&&b==='H'&&cls(pp)==='J'&&'がをは'.indexOf(p)>=0){var hr=0;while(cls(full[i+hr])==='H')hr++;if(hr>=4)return true;}
+    if(a==='H'&&(b==='J'||b==='K'||b==='A')){
+      if(cls(pp)==='J'&&'のをがはにでとへもや'.indexOf(p)<0)return false;
+      return true;
+    }
+    if(a==='K'&&b==='J'&&cls(pp)==='K'&&'用的風製式型様付台類内外中店'.indexOf(c)<0)return true;
+    if(a==='K'&&b==='A'&&cls(pp)==='K'&&/[A-Za-z0-9]/.test(c))return true;
+    if(a==='K'&&b==='K'){var head=full.slice(0,i),run=0;while(cls(full[i+run])==='K')run++;if(run>=3&&/(アミューズメント|ポーカー|カジノ|ドリンク|リングゲーム|トーナメント)$/.test(head))return true;}
+    return false;
+  }
+  function joinHere(full,i){
+    var p=full[i-1],c=full[i];if(!p||!c)return false;
+    if('）」』】〉》］)'.indexOf(p)>=0&&cls(c)==='H')return true;
+    if(p==='・'||c==='・'){var at=(p==='・')?i-1:i,L=0,R=0;while(at-1-L>=0&&/[一-龯々ァ-ヺー]/.test(full[at-1-L]))L++;while(/[一-龯々ァ-ヺー]/.test(full[at+1+R]||''))R++;if(L<=3&&R<=3)return true;}
+    if(c==='〜'||p==='〜')return true;
+    if((p==='-'||c==='-')&&/[0-9]/.test(p+c))return true;
+    return false;
+  }
+  var blocks=[].slice.call(document.querySelectorAll(BLOCK)).filter(function(el){
+    return !el.closest(SKIP)&&!el.querySelector(BLOCK);
+  });
+  blocks.forEach(function(el){
+    var items=[],full='';
+    (function walk(n){
+      for(var k=n.firstChild;k;k=k.nextSibling){
+        if(k.nodeType===3){items.push({node:k,start:full.length});full+=k.data;}
+        else if(k.nodeType===1){
+          if(k.tagName==='BR'){items.push({br:k,pos:full.length});full+='\n';}
+          else if(!k.matches(SKIP))walk(k);
+        }
+      }
+    })(el);
+    if(!full.trim())return;
+    var KEEP=[/REX POKER NAGOYA/g,/23ビル B2F/g];function nb(s){KEEP.forEach(function(re){s=s.replace(re,function(m){return m.replace(/ /g,'\u00a0');});});return s;}
+    items.forEach(function(it){if(it.node){var v=nb(it.node.data);if(v!==it.node.data)it.node.data=v;}});
+    full=nb(full);
+    var ops={};
+    // 文の終わりで改行
+    for(var i=1;i<full.length;i++){
+      if(END.indexOf(full[i-1])>=0&&CLOSE.indexOf(full[i])<0&&full[i]!=='\n'&&full.slice(i).trim()!==''){
+        var j=i;while(j<full.length&&/[ \t\r\n]/.test(full[j])&&full[j]!=='\n')j++;
+        if(full[j]!=='\n')ops[i]='br';
+      }
+    }
+    // バカラ〜ブラックジャックを行の頭に
+    var m;BJ.lastIndex=0;
+    while((m=BJ.exec(full))){
+      var at=m.index;if('（「『'.indexOf(full[at-1])>=0)at--;
+      var nl=full.lastIndexOf('\n',at-1);var since=full.slice(nl+1,at);
+      var lastBr=-1;for(var q in ops){q=+q;if(ops[q]==='br'&&q<=at&&q>lastBr)lastBr=q;}
+      if(lastBr>nl+1)since=full.slice(lastBr,at);
+      if(since.trim()!=='')ops[at]='br';
+    }
+    // br.sp（スマホだけの改行）と重なる所は常に改行に
+    items.forEach(function(it){
+      if(it.br&&it.br.classList.contains('sp')){
+        var p=it.pos;BJ.lastIndex=0;
+        if(END.indexOf(full[p-1])>=0||full.slice(p+1).search(BJ)===0)it.br.classList.remove('sp');
+      }
+    });
+    // 言葉の切れ目
+    var SPR=/（[^（）\n]{1,8}）/g,sm;while((sm=SPR.exec(full))){for(var z=sm.index+1;z<sm.index+sm[0].length;z++)if(ops[z]!=='br')ops[z]='wj';}
+    NOBR.forEach(function(w){var k=full.indexOf(w);while(k>=0){for(var z=k+1;z<k+w.length;z++)if(ops[z]!=='br')ops[z]='wj';k=full.indexOf(w,k+1);}});
+    for(var i2=1;i2<full.length;i2++){if(ops[i2])continue;if(joinHere(full,i2))ops[i2]='wj';else if(canBreak(full,i2))ops[i2]='wbr';}
+    var any=false;
+    items.forEach(function(it){
+      if(!it.node)return;
+      var s=it.node.data,st=it.start,frag=document.createDocumentFragment(),last=0,changed=false;
+      for(var x=0;x<s.length;x++){
+        var o=ops[st+x];
+        if(o&&!(x===0&&o==='wbr')){
+          if(x>last)frag.appendChild(document.createTextNode(s.slice(last,x)));
+          frag.appendChild(o==='wj'?document.createTextNode('\u2060'):document.createElement(o));last=x;changed=true;
+        }else if(o&&x===0){
+          frag.appendChild(o==='wj'?document.createTextNode('\u2060'):document.createElement(o));changed=true;
+        }
+      }
+      if(!changed)return;
+      frag.appendChild(document.createTextNode(s.slice(last)));
+      it.node.parentNode.replaceChild(frag,it.node);any=true;
+    });
+    el.classList.add('jl');
+  });
+});
+</script>
+<style id="jp-linebreak">
+/* 日本語の改行を整える（2026-11-13）：文ごとに改行し、言葉の途中では切らない */
+.hero .wrap,.hero-lp .wrap,.perks>div,.after>div,.worries>div,.why>div,.drinks>div,.games>article,.steps>li{min-width:0}
+.jl{word-break:keep-all;overflow-wrap:break-word;line-break:strict;text-wrap:balance}
+@media (max-width:767px){.answer{padding:20px 18px;font-size:15px}}
+h1,h2,h3,h4,.label,.q,summary,.btn,.tag,.zero,.badges span,figcaption,th{text-wrap:balance}
+p,li,td,dd,dt,small,details p{text-wrap:pretty}
+.btn{text-align:center}
+.game li{padding-left:1em;text-indent:-1em}
+.rules li.col-top{}
+@media (min-width:768px){.rules li.col-top{break-before:column;-webkit-column-break-before:always}}
+@media (max-width:767px){.bubble{padding:20px 16px}.bubble .a{font-size:15px}}
+</style>
+<style id="wine-accent">
+/* ワインレッドの差し色（2026-11-13） */
+:root{--wine-hi:#a8363d;--wine-soft:rgba(122,31,34,.22)}
+header{border-bottom:1px solid rgba(168,54,61,.55)}
+.label::before{content:"";display:inline-block;width:20px;height:2px;background:var(--wine-hi);vertical-align:middle;margin:-2px 10px 0 0}
+h2::after{content:"";display:block;width:56px;height:3px;margin-top:14px;border-radius:2px;background:linear-gradient(90deg,var(--wine-hi),var(--wine))}
+.cta h2::after{margin-left:auto;margin-right:auto}
+main>section:nth-of-type(even):not(.hero):not(.hero-lp):not(.cta){background:radial-gradient(120% 90% at 100% 0%,var(--wine-soft),transparent 62%),var(--bg)}
+main>section:nth-of-type(odd):not(.hero):not(.hero-lp):not(.cta){background:radial-gradient(110% 80% at 0% 100%,rgba(122,31,34,.12),transparent 60%),var(--bg)}
+.hero::after{background:linear-gradient(90deg,rgba(18,15,13,.88) 0%,rgba(18,15,13,.55) 55%,rgba(18,15,13,.2) 100%),linear-gradient(180deg,rgba(18,15,13,0) 55%,var(--bg) 100%),radial-gradient(90% 70% at 0% 100%,rgba(122,31,34,.45),transparent 70%)}
+.hero-lp{box-shadow:inset 0 -160px 140px -100px rgba(122,31,34,.45)}
+.answer{border-left:4px solid var(--wine-hi)}
+.q{background:linear-gradient(135deg,rgba(122,31,34,.62),rgba(122,31,34,.32))}
+.bubble,.steps li,.perks div,.after div,.drinks>div{border-top:3px solid var(--wine)}
+.game{border-top:3px solid var(--wine)}
+.why div{border-top-color:var(--wine-hi)}
+.rules li::before{color:var(--wine-hi)}
+.sisterbox,.sister{border-left-color:var(--wine-hi)}
+.pricebox{background:linear-gradient(135deg,rgba(122,31,34,.38),var(--surface) 62%)}
+details[open]{background:linear-gradient(90deg,rgba(122,31,34,.14),transparent 70%)}
+.cta{background:radial-gradient(90% 120% at 50% 100%,rgba(122,31,34,.6),transparent 72%),var(--bg)}
+footer{background:#170d0c;border-top:2px solid var(--wine)}
+.fixbar{border-top:2px solid var(--wine)!important}
+.wrap.crumb{padding-left:20px;padding-right:20px}
+.faq-item{border-bottom:1px solid var(--line);padding:20px 0}
+.faq-q{position:relative;padding-left:2em;font-family:var(--body);font-size:17px;font-weight:700;line-height:1.7;margin:0}
+.faq-q::before{content:"Q";position:absolute;left:0;top:0;font-family:var(--display);color:var(--gold)}
+.faq-a{position:relative;padding-left:2em;color:var(--mute);margin-top:8px}
+.faq-a::before{content:"A";position:absolute;left:0;top:0;font-family:var(--display);font-weight:700;color:var(--wine-hi)}
+</style>
 </head>
 <body>
 <header><div class="wrap">
@@ -152,24 +313,24 @@ footer a{text-decoration:underline}
     <img class="crest" src="img/logo_crest.png" alt="VALHALLAの紋章" width="88" height="68">
     <span class="label">AMUSEMENT CASINO BAR IN SAKAE, NAGOYA</span>
     <h1>はじめての<br class="sp">ポーカーを、<br><em>VALHALLA</em>で。</h1>
-    <p>名古屋・栄のアミューズメントカジノバー。ルールを知らなくても、スタッフが1から教えます。</p>
+    <p>名古屋・栄のアミューズメントカジノバー。ルールを知らなくても、<br class="sp">スタッフが1から教えます。</p>
     <p class="zero"><span>初心者講習</span><b>0</b><span>円</span></p>
     <div class="btns"><a class="btn btn-main" href="https://line.me/R/ti/p/@642opvwh" target="_blank" rel="noopener">公式LINEで初心者講習を予約</a><a class="btn btn-sub" href="#price">料金を見る</a></div>
-    <small>予約なしでも入れます。初心者講習（0円）は前日までのご予約が必要です。</small>
+    <small>予約なしでも入れます。<br class="sp">初心者講習（0円）は前日までのご予約が必要です。</small>
   </div>
 </section>
 
 <section style="border:0;padding-top:0"><div class="wrap">
-  <p class="answer">VALHALLA（ヴァルハラ）は、名古屋市中区栄3丁目（栄駅から徒歩5分）にあるアミューズメントカジノバーです。営業は平日 17:00〜23:00、土日・祝日 14:00〜23:00。エントランス1,000円（ソフトドリンク飲み放題）または2,000円（アルコールも飲み放題）。ポーカーのほか、バカラやブラックジャックも遊べます。初めての方は、前日までの予約で初心者講習が0円です。お金は賭けず、景品との交換もありません。18歳以上の方がご利用いただけます。Googleの口コミは<span class="stars">★4.9</span>（339件）。</p>
+  <p class="answer">VALHALLA（ヴァルハラ）は、名古屋市中区栄3丁目（栄駅から徒歩5分）にあるアミューズメントカジノバーです。営業は平日 17:00〜23:00、<br class="sp">土日・祝日 14:00〜23:00。エントランス1,000円<br class="sp">（ソフトドリンク飲み放題）または<br class="sp">2,000円（アルコールも飲み放題）。ポーカーのほか、バカラやブラックジャックも遊べます。初めての方は、前日までの予約で初心者講習が0円です。お金は賭けず、<br class="sp">景品との交換もありません。18歳以上の方がご利用いただけます。Googleの口コミは<span class="stars">★4.9</span>（339件）。</p>
 </div></section>
 
 <section id="first"><div class="wrap">
   <span class="label">FOR BEGINNERS</span>
   <h2>こんな不安、ありませんか？</h2>
   <div class="worries">
-    <div class="bubble"><p class="q">ルールをまったく知らない…</p><p class="a"><b>大丈夫です。</b>45分ほどの初心者講習で、遊び方を1から教えます。前日までに予約すれば0円。終わったらそのまま実戦へ。</p></div>
-    <div class="bubble"><p class="q">料金がわかりにくそう…</p><p class="a"><b>シンプルです。</b>エントランス（ドリンク飲み放題つき）と、遊ぶゲームのエントリー料金だけ。リングゲームはいつでもやめられます。</p></div>
-    <div class="bubble"><p class="q">初心者だけで行っても平気？</p><p class="a"><b>平気です。</b>初めての方や女性だけのグループも多く来店しています。スタッフが丁寧にサポートします。</p></div>
+    <div class="bubble"><p class="q">ルールをまったく知らない…</p><p class="a"><b>大丈夫です。</b>45分ほどの初心者講習で、<br class="sp">遊び方を1から教えます。前日までに予約すれば0円。終わったらそのまま実戦へ。</p></div>
+    <div class="bubble"><p class="q">料金がわかりにくそう…</p><p class="a"><b>シンプルです。</b>エントランス（ドリンク飲み放題つき）と、<br class="sp">遊ぶゲームのエントリー料金だけ。リングゲームはいつでもやめられます。</p></div>
+    <div class="bubble"><p class="q">初心者だけで行っても平気？</p><p class="a"><b>平気です。</b>初めての方や、<br class="sp">女性だけのグループも<br class="sp">多く来店しています。スタッフが丁寧にサポートします。</p></div>
   </div>
 </div></section>
 
@@ -191,13 +352,13 @@ footer a{text-decoration:underline}
   <div class="games">
     <article class="game feat"><div class="img" style="background-image:url(img/people_cards.jpg)"></div><div class="body"><span class="tag tag-gold">前日までの予約で0円</span><h3>初心者講習プラン</h3><p class="for">遊び方を教わって、そのまま実戦へ</p><ul><li>45分ほどで、スタッフが1から教えます</li><li>リングゲーム用チップ 250VAL（50BB）付き</li><li>通常2,000円。前日までに予約すると0円</li></ul><p class="price">0<small>円（予約時）</small></p></div></article>
     <article class="game"><div class="img" style="background-image:url(img/drinks.jpg)"></div><div class="body"><span class="tag">飲み放題つき</span><h3>エントランス</h3><p class="for">入場料に、ドリンク飲み放題が込み。ドリンクはすべて手作りです。</p><table class="etable"><tr><th>ソフトドリンク飲み放題</th><td>1,000<small>円</small></td></tr><tr><th>アルコールも飲み放題<br><small>20歳以上の方</small></th><td>2,000<small>円</small></td></tr></table></div></article>
-    <article class="game"><div class="img" style="background-image:url(img/room_tables.jpg)"></div><div class="body"><span class="tag">チップつき</span><h3>リング・サイドゲーム</h3><p class="for">ポーカーのリングゲームと、バカラ・ブラックジャック</p><ul><li>エントリーで 250VAL（50BB）。バカラ・ブラックジャックも共通</li><li>預けたチップがある方は、エントリーで引き出して参加（リングは1,000VALまで、サイドゲームは上限なし）</li><li>同じ日の2回目以降の引き出しは、1回1,000円</li><li>リングのレートは 2-5</li><li>いつでもやめられて、残ったチップは預けられます</li></ul><p class="price">3,000<small>円</small></p></div></article>
+    <article class="game"><div class="img" style="background-image:url(img/room_tables.jpg)"></div><div class="body"><span class="tag">チップつき</span><h3>リング・サイドゲーム</h3><p class="for">ポーカーのリングゲームと、バカラ・ブラックジャック</p><ul><li>エントリーで 250VAL（50BB）。バカラ・ブラックジャックも共通</li><li>エントリー時に預けチップを引き出してゲーム開始（リングは1,000VALまで、サイドゲームは上限なし）</li><li>同じ日の2回目以降の引き出しは、1回1,000円</li><li>リングのレートは 2-5</li><li>いつでもやめられて、残ったチップは預けられます</li></ul><p class="price">3,000<small>円</small></p></div></article>
   </div>
   <details style="margin-top:16px"><summary>チップの追加購入</summary><table class="etable" style="margin-top:8px"><tr><th>2,000円</th><td>250VAL（50BB）</td></tr><tr><th>3,500円</th><td>500VAL（100BB）</td></tr><tr><th>6,000円</th><td>1,000VAL（200BB）</td></tr><tr><th>25,000円</th><td>5,000VAL（1,000BB）</td></tr><tr><th>45,000円</th><td>10,000VAL（2,000BB）</td></tr></table></details>
   <div class="games" style="margin-top:24px">
-    <article class="game"><div class="body"><span class="tag tag-gold">割引</span><h3>学生・女性の方</h3><p class="for">リングゲームのエントリーが1,000円引き。学生の方は学生証を見せてください（学生と女性の割引は重ねられません）。</p><p class="price">-1,000<small>円</small></p></div></article>
-    <article class="game"><div class="body"><span class="tag tag-gold">割引</span><h3>オープンから2時間以内</h3><p class="for">平日は17:00〜19:00、土日祝は14:00〜16:00のご来店で、リングゲームのエントリーが1,000円引き。学生・女性の割引と一緒に使えます。</p><p class="price">-1,000<small>円</small></p></div></article>
-    <article class="game"><div class="body"><span class="tag">安心</span><h3>料金は後払い</h3><p class="for">お支払いは帰るときにまとめて。遊んでいる途中でも、いくらになっているか確認できます。</p></div></article>
+    <article class="game"><div class="body"><span class="tag tag-gold">割引</span><h3>学生・女性の方</h3><p class="for">リングゲームのエントリーが1,000円引き。学生の方は学生証を見せてください<br class="sp">（学生と女性の割引は重ねられません）。</p><p class="price">-1,000<small>円</small></p></div></article>
+    <article class="game"><div class="body"><span class="tag tag-gold">割引</span><h3>オープンから2時間以内</h3><p class="for">平日は17:00〜19:00、<br class="sp">土日祝は14:00〜16:00のご来店で、<br class="sp">リングゲームのエントリーが<br class="sp">1,000円引き。学生・女性の割引と一緒に使えます。</p><p class="price">-1,000<small>円</small></p></div></article>
+    <article class="game"><div class="body"><span class="tag">安心</span><h3>料金は後払い</h3><p class="for">お支払いは帰るときにまとめて。遊んでいる途中でも、<br class="sp">いくらになっているか確認できます。</p></div></article>
   </div>
   <p class="note">※トーナメントの内容と参加料は、日によって変わります。最新の情報は公式LINE・lit.linkでお知らせします。</p>
 </div></section>
@@ -208,7 +369,7 @@ footer a{text-decoration:underline}
   <p class="lead">VALHALLAでは、ポーカーのほかにバカラとブラックジャックも遊べます。カジノの定番ゲームを、ひとつのお店でまとめて楽しめます。</p>
   <div class="games">
     <article class="game"><div class="img" style="background-image:url(img/people_table.jpg)"></div><div class="body"><span class="tag">メイン</span><h3>ポーカー</h3><p class="for">リングゲームとトーナメント。初心者講習から始められます。</p></div></article>
-    <article class="game"><div class="img" style="background-image:url(img/baccarat.jpg)"></div><div class="body"><span class="tag">サイドゲーム</span><h3>バカラ・ブラックジャック</h3><p class="for">同じテーブルで遊べます。バカラは「バンカー」か「プレイヤー」かを予想、ブラックジャックはカードの合計を21に近づけるゲームです。</p></div></article>
+    <article class="game"><div class="img" style="background-image:url(img/baccarat.jpg)"></div><div class="body"><span class="tag">サイドゲーム</span><h3>バカラ・ブラックジャック</h3><p class="for">同じテーブルで遊べます。バカラは<br class="sp">「バンカー」か「プレイヤー」かを予想、<br class="sp">ブラックジャックはカードの合計を21に近づけるゲームです。</p></div></article>
     <article class="game"><div class="img" style="background-image:url(img/room_tables.jpg)"></div><div class="body"><span class="tag">日替わり</span><h3>トーナメント</h3><p class="for">最後の1人まで勝ち残る形式。内容と参加料は日によって変わります。</p></div></article>
   </div>
 </div></section>
@@ -230,7 +391,7 @@ footer a{text-decoration:underline}
   <div>
     <span class="label">DRINK</span>
     <h2>ドリンクは、すべて手作り。</h2>
-    <p class="lead">飲み放題のドリンクも、ひとつひとつ手作りでお出ししています。ビールやカクテル、シャンパンもあります。ゲームの合間に、ゆっくり楽しんでください。</p>
+    <p class="lead">飲み放題のドリンクも、<br class="sp">ひとつひとつ手作りでお出ししています。ビールやカクテル、シャンパンもあります。ゲームの合間に、ゆっくり楽しんでください。</p>
     <div class="drinks"><div><p class="lead">ソフトドリンク飲み放題</p><p class="big">1,000<small>円</small></p><p class="note" style="margin-top:4px">エントランスに込み</p></div><div><p class="lead">アルコール飲み放題</p><p class="big">2,000<small>円</small></p><p class="note" style="margin-top:4px">エントランスに込み</p></div></div>
     <p class="note">※20歳未満の方にはお酒をお出ししません。</p>
   </div>
@@ -265,7 +426,7 @@ footer a{text-decoration:underline}
     <li>18歳未満の方はご利用いただけません</li>
     <li>お金を賭けることは一切禁止です</li>
     <li>チップの景品・金品への交換は行っていません</li>
-    <li>電子タバコは店内の指定の場所でお願いします</li>
+    <li class="col-top">電子タバコは店内の指定の場所でお願いします</li>
     <li>紙タバコは、外の指定の場所でお願いします</li>
     <li>20歳未満の方にはお酒をお出ししません</li>
     <li>ルールの判断は、スタッフ・ディーラーが行います</li>
@@ -275,15 +436,42 @@ footer a{text-decoration:underline}
 <section id="faq"><div class="wrap" style="max-width:820px">
   <span class="label">FAQ</span>
   <h2>よくある質問</h2>
-  <details open><summary>お金を賭けるんですか？</summary><p>賭けません。エントランス料金でチップを受け取って遊びます。景品やお金への交換もありません。</p></details>
-  <details><summary>ポーカーを知らなくても大丈夫ですか？</summary><p>大丈夫です。初心者講習でスタッフが1から教えます。前日までに公式LINEで予約すると0円です。</p></details>
-  <details><summary>料金はいくらかかりますか？</summary><p>エントランス1,000円（ソフトドリンク飲み放題）、またはアルコール飲み放題つきの2,000円です。これに加えて、リングゲームとサイドゲーム（バカラ・ブラックジャック）はエントリー3,000円（チップつき）です。預けたチップがあれば、引き出して参加できます。トーナメントの参加料は日によって変わります。</p></details>
-  <details><summary>予約は必要ですか？</summary><p>予約なしでも入れます。初心者講習（0円）を受けたい方は、前日までに公式LINEで予約してください。</p></details>
-  <details><summary>何歳から入れますか？</summary><p>18歳以上の方がご利用いただけます。お酒は20歳以上の方のみです。</p></details>
-  <details><summary>途中でやめてもいいですか？</summary><p>いつでもやめられます。残ったチップはお店に預けて、次回はエントリーせずに引き出して参加できます。</p></details>
-  <details><summary>タバコは吸えますか？</summary><p>電子タバコは店内の指定の場所で吸えます。紙タバコは外の指定の場所をご利用ください。</p></details>
-  <details><summary>ドリンクはどんなものがありますか？</summary><p>ソフトドリンクとアルコールがあり、すべて手作りでお出ししています。</p></details>
-  <details><summary>お店はどこから入りますか？</summary><p>23ビルの地下2階です。下の「お店までの道順」の動画で、入口からお店までの行き方を見られます。</p></details>
+  <div class="faq-item">
+<h3 class="faq-q">お金を賭けるんですか？</h3>
+<p class="faq-a">賭けません。エントランス料金で<br class="sp">チップを受け取って遊びます。景品やお金への交換もありません。</p>
+</div>
+  <div class="faq-item">
+<h3 class="faq-q">ポーカーを知らなくても大丈夫ですか？</h3>
+<p class="faq-a">大丈夫です。初心者講習でスタッフが1から教えます。前日までに<br class="sp">公式LINEで予約すると0円です。</p>
+</div>
+  <div class="faq-item">
+<h3 class="faq-q">料金はいくらかかりますか？</h3>
+<p class="faq-a">エントランス1,000円（ソフトドリンク飲み放題）、またはアルコール飲み放題つきの2,000円です。これに加えて、リングゲームとサイドゲーム（バカラ・ブラックジャック）はエントリー3,000円（チップつき）です。預けたチップがあれば、引き出して参加できます。トーナメントの参加料は日によって変わります。</p>
+</div>
+  <div class="faq-item">
+<h3 class="faq-q">予約は必要ですか？</h3>
+<p class="faq-a">予約なしでも入れます。初心者講習（0円）を受けたい方は、前日までに公式LINEで予約してください。</p>
+</div>
+  <div class="faq-item">
+<h3 class="faq-q">何歳から入れますか？</h3>
+<p class="faq-a">18歳以上の方がご利用いただけます。お酒は20歳以上の方のみです。</p>
+</div>
+  <div class="faq-item">
+<h3 class="faq-q">途中でやめてもいいですか？</h3>
+<p class="faq-a">いつでもやめられます。残ったチップはお店に預けられます。次回来たときは、預けたチップを引き出して、チップが多い状態から始められます。</p>
+</div>
+  <div class="faq-item">
+<h3 class="faq-q">タバコは吸えますか？</h3>
+<p class="faq-a">電子タバコは店内の指定の場所で吸えます。紙タバコは外の指定の場所をご利用ください。</p>
+</div>
+  <div class="faq-item">
+<h3 class="faq-q">ドリンクはどんなものがありますか？</h3>
+<p class="faq-a">ソフトドリンクとアルコールがあり、すべて手作りでお出ししています。</p>
+</div>
+  <div class="faq-item">
+<h3 class="faq-q">お店はどこから入りますか？</h3>
+<p class="faq-a">23ビルの地下2階です。下の「お店までの道順」の動画で、入口からお店までの行き方を見られます。</p>
+</div>
 </div></section>
 
 <section id="access"><div class="wrap access">
