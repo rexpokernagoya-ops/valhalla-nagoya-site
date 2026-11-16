@@ -334,13 +334,14 @@ body.menu-open{overflow:hidden}
 <style id="hero-slides-css">
 /* トップの写真スライドショー（2026-11-15：新しい動画ができるまで） */
 .hero-slides{overflow:hidden;background:#120f0d}
-.hero-slides img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;animation:heroFade 20s infinite}
+.hero-slides img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;animation:heroFade 24s infinite}
 .hero-slides img:nth-child(1){animation-delay:0s}
 .hero-slides img:nth-child(2){animation-delay:4s}
 .hero-slides img:nth-child(3){animation-delay:8s}
 .hero-slides img:nth-child(4){animation-delay:12s}
 .hero-slides img:nth-child(5){animation-delay:16s}
-@keyframes heroFade{0%{opacity:0;transform:scale(1)}5%{opacity:1}20%{opacity:1}27%{opacity:0;transform:scale(1.06)}100%{opacity:0;transform:scale(1.06)}}
+.hero-slides img:nth-child(6){animation-delay:20s}
+@keyframes heroFade{0%{opacity:0;transform:scale(1)}4.2%{opacity:1}16.7%{opacity:1}22.5%{opacity:0;transform:scale(1.06)}100%{opacity:0;transform:scale(1.06)}}
 .hero-slides img:first-child{opacity:1}
 .hero-slides img:nth-child(2){object-position:center 90%}
 @media (prefers-reduced-motion:reduce){.hero-slides img{animation:none;opacity:0}.hero-slides img:first-child{opacity:1}}
@@ -368,7 +369,7 @@ body.menu-open{overflow:hidden}
 <section class="hero">
   <!-- 新しい動画ができるまで静止画（元の動画 img/hero.mp4 は残してある。戻すときは下の行をこのvideoタグに戻す）
   <video class="hero-video" src="img/hero.mp4" poster="img/poster.jpg" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video> -->
-  <div class="hero-video hero-slides" aria-hidden="true"><img src="img/hero_1.jpg" alt="" fetchpriority="high"><img src="img/hero_2.jpg" alt="" loading="lazy"><img src="img/hero_3.jpg" alt="" loading="lazy"><img src="img/hero_4.jpg" alt="" loading="lazy"><img src="img/hero_5.jpg" alt="" loading="lazy"></div>
+  <div class="hero-video hero-slides" aria-hidden="true"><img src="img/hero_1.jpg" alt="" fetchpriority="high"><img src="img/hero_2.jpg" alt="" loading="lazy"><img src="img/hero_3.jpg" alt="" loading="lazy"><img src="img/hero_4.jpg" alt="" loading="lazy"><img src="img/hero_5.jpg" alt="" loading="lazy"><img src="img/bj_wide.jpg" alt="" loading="lazy"></div>
   <div class="wrap">
     <img class="crest" src="img/logo_crest.png" alt="VALHALLAの紋章" width="88" height="68">
     <span class="label">AMUSEMENT CASINO BAR IN SAKAE, NAGOYA</span>
@@ -430,7 +431,7 @@ body.menu-open{overflow:hidden}
   <p class="lead">VALHALLAでは、ポーカーのほかにバカラとブラックジャックも遊べます。カジノの定番ゲームを、ひとつのお店でまとめて楽しめます。</p>
   <div class="games">
     <article class="game"><div class="img" style="background-image:url(img/people_table.jpg)"></div><div class="body"><span class="tag">メイン</span><h3>ポーカー</h3><p class="for">リングゲームとトーナメント。初心者講習から始められます。</p></div></article>
-    <article class="game"><div class="img" style="background-image:url(img/baccarat_table.jpg)"></div><div class="body"><span class="tag">サイドゲーム</span><h3>バカラ・ブラックジャック</h3><p class="for">同じテーブルで遊べます。バカラは<br class="sp">「バンカー」か「プレイヤー」かを予想、<br class="sp">ブラックジャックはカードの合計を21に近づけるゲームです。</p></div></article>
+    <article class="game"><div class="img" style="background-image:url(img/bj_hands.jpg)"></div><div class="body"><span class="tag">サイドゲーム</span><h3>バカラ・ブラックジャック</h3><p class="for">同じテーブルで遊べます。バカラは<br class="sp">「バンカー」か「プレイヤー」かを予想、<br class="sp">ブラックジャックはカードの合計を21に近づけるゲームです。</p></div></article>
     <article class="game"><div class="img" style="background-image:url(img/room_tables.jpg)"></div><div class="body"><span class="tag">日替わり</span><h3>トーナメント</h3><p class="for">最後の1人まで勝ち残る形式。内容と参加料は日によって変わります。</p></div></article>
   </div>
   <p class="more"><a class="btn btn-sub" href="baccarat-blackjack/">バカラ・ブラックジャックの遊び方を見る →</a></p>
